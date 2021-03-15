@@ -24,7 +24,6 @@ Function Initialize() Uint64
     30 STORE("maxWager", 1000000) // Maximum wager set to 10 DERO
     40 STORE("sc_giveback", 9800)   // SC will give reward 98% of deposits/winnings, 2.0 % is accumulated for owner to withdraw as well as SC to keep for processing fees etc.
     50 STORE("balance", 0)
-    55 STORE("err", "")
 
     60 STORE("Over-x2", 50)
     61 STORE("Under-x2", 49)
@@ -48,30 +47,21 @@ Function Initialize() Uint64
     190 STORE("minMultiplier", 2) // TODO: Add to TuneWagerParameters, if and only if develop loop to generate the Over-x# and Under-x# values. Can do with math and looping for var creation incrementing tempcounter, just need to circle back to it
     191 STORE("maxMultiplier", 10) // TODO: Add to TuneWagerParameters, if and only if develop loop to generate the Over-x# and Under-x# values. Can do with math and looping for var creation incrementing tempcounter, just need to circle back to it
 
-    //200 PRINTF "Initialize executed"
     210 RETURN 0
 End Function
 
 Function TuneWagerParameters(minWager Uint64, maxWager Uint64, sc_giveback Uint64) Uint64
-	10 DIM tempcounter as Uint64
-    // 20 IF ADDRESS_RAW(LOAD("owner")) == ADDRESS_RAW(SIGNER()) THEN GOTO 30 // Validate owner is one calling this function, otherwise return 1
-    20 IF LOAD("owner") == SIGNER() THEN GOTO 30 // Validate owner is one calling this function, otherwise return 1
-    22 STORE("err", LOAD("owner") + "-" + SIGNER())
+    10 IF LOAD("owner") == SIGNER() THEN GOTO 30 // Validate owner is one calling this function, otherwise return
 	25 RETURN 1
-	30 IF minWager != 0 THEN STORE("minWager", minWager)
-	35 IF maxWager != 0 THEN STORE("maxWager", maxWager)
-    40 IF sc_giveback != 0 THEN STORE("sc_giveback", sc_giveback)
-    42 STORE("err", minWager + "-" + maxWager + "-" + sc_giveback)
 
-    // 60 IF minMultiplier > 1 THEN STORE("minMultiplier", minMultiplier) ELSE GOTO 150 // If minimum multiplier is greater than 1, otherwise go to 150 to continue to check on max multiplier. 
+    30 IF minWager <= 0 THEN GOTO 40
+    35 STORE("minWager", minWager)
+    40 IF maxWager <= 0 THEN GOTO 50
+    45 STORE("maxWager", maxWager)
+    50 IF sc_giveback <= 0 THEN GOTO 60
+    55 STORE("sc_giveback", sc_giveback)
 
-    // TODO: Loop to generate / store over-under values. Check exists() prior. If exists() for a given minimum (e.g. 2 or 3), then no need. If not, then create. Over time the list of multiplier vals will be stored
-
-    // 150 IF maxMultiplier != 0 THEN STORE("maxMultiplier", maxMultiplier) ELSE GOTO 200 // If max multiplier exists, then generate otherwise go to end RETURN
-
-    // TODO: Loop to generate / store over-under values. Check exists() prior. If exists() for a given maximum (e.g. 12 or 13), then no need. If not, then create. Over time the list of multiplier vals will be stored
-
-	200 RETURN 0 
+    60 RETURN 0
 End Function
 
 Function Error(errorMessage String) Uint64
