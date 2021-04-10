@@ -76,6 +76,8 @@ Options:
 ### Client Service (local TX processing and SC sending)
 DeroDice-Client.go contains the client service code, also see releases for the pre-built binary for ease-of use (though I always recommend building binaries yourself). This is intended to be ran locally alongside your normal cli-wallet (or other rpc-server capable wallet(s)). 
 
+IMPORTANT: If you send DERO to the server service address, you are only performing the initial steps to generate a userKey and you must be running the client service in order to send your gameplay to the smart contract. Please ensure that you are running the client service alongside your local wallet instance :)
+
 NOTE: Ensure that the rpc-server (wallet) port used is different between the server service and client service if ran on the same machine.
 
 ![DERO Dice Client Service](assets/clientService.PNG?raw=true)
