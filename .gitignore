@@ -1,0 +1,4 @@
+/cmd/client-service/Dero_Dice_*
+/cmd/server-service/Dero_Dice_*
+/cmd/client-service/*.exe
+/cmd/server-service/*.exe

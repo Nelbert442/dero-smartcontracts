@@ -1,0 +1,230 @@
+<!-- Dice Stats -->
+<div style="height:10px"></div>
+<h3 class="push-up-20" data-tkey="faq1_title">How to play?</h3>
+<div class="card padding-15 push-down-10" data-tkey="faq1_text">
+	<p>Download or build the client service binary:  <a href="https://github.com/Nelbert442/dero-smartcontracts/releases">DERO Dice Service (Client)</a> </p>
+
+	<p>Utilize option 5 within the cli-wallet (send a normal TX) to one of the addresses below in 'Connection Details'.</p>
+	<ul>
+		<li>"Custom Bet Address" - Utilizing this address will let you define an amount to wager.</li>
+		<li>"Set Bet Address" - Utilizing this address will auto-define the wager amount to 1 DERO.</li>
+	</ul>
+
+	<p>See more details about the services here: <a href="https://github.com/Nelbert442/dero-smartcontracts">DERO Dice</a></p>
+</div>
+<div style="height:10px"></div>
+<h3 class="push-up-15"><span data-tkey="connectionDetails">Connection Details<span></h3>
+	<div class="card padding-l-10 padding-r-10">
+		<div class="stats">
+			<div><i class="fa fa-money"></i> <span data-tkey="customBetAddr">Custom Bet Address: </span><span id="customBetAddress" style="word-wrap: break-word;"></span></div>
+			<div><i class="fa fa-money"></i> <span data-tkey="setBetAddr">Set Bet Address: </span><span id="setBetAddress" style="word-wrap: break-word;"></span></div>
+		</div>
+	</div>
+<div style="height:10px"></div>
+<!--<h3 class="push-up-15"><span data-tkey="odds">Odds<span></h3>-->
+<div class="scrollWrapper">
+<div class="table-responsive"><h3><span data-tkey="odds">Odds</span></h3>
+	<table class="table table-hover">
+		<thead>
+		<tr>
+			<th><i class="fa fa-money"></i> Multiplier</th>
+			<th><i class="fa fa-clock-o"></i> Base Ratio</th>
+			<th><i class="fa fa-paw"></i> Historical Ratio</th>
+		</tr>
+		</thead>
+		<tbody id="dice_odds">
+		</tbody>
+	</table>
+</div>
+</div>
+<div class="scrollWrapper2">
+<!--<h3 class="push-up-15"><span data-tkey="history">History<span></h3>-->
+	<div class="table-responsive"><h3><span data-tkey="history">History</span></h3>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th><i class="fa fa-group"></i> ID</th>
+				<th><i class="fa fa-money"></i> Won</th>
+				<th><i class="fa fa-money"></i> Multiplier</th>
+				<th><i class="fa fa-clock-o"></i> Topoheight</th>
+				<th><i class="fa fa-paw"></i> TxID</th>
+			</tr>
+			</thead>
+			<tbody id="dice_multiplier_stats">
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+    currentPage = {
+        destroy: function(){
+        },
+        update: function(){
+			if (lastStats.rollResults != null) {
+					renderStats(lastStats.rollResults);
+			}
+			if (lastStats.rollOdds != null) {
+				renderOdds(lastStats.rollOdds);
+			}
+
+			if (lastStats.customBetAddress != null) {
+			updateText('customBetAddress', lastStats.customBetAddress.toString());
+			} else { updateText('customBetAddress', "N/A"); }
+
+			if (lastStats.setBetAddress != null) {
+			updateText('setBetAddress', lastStats.setBetAddress.toString());
+			} else { updateText('setBetAddress', "N/A"); }
+
+			setInterval(function(){ 
+				if (lastStats.rollResults != null) {
+					renderStats(lastStats.rollResults);
+				}
+
+				if (lastStats.rollOdds != null) {
+					renderOdds(lastStats.rollOdds);
+				}
+
+				if (lastStats.customBetAddress != null) {
+				updateText('customBetAddress', lastStats.customBetAddress.toString());
+				} else { updateText('customBetAddress', "N/A"); }
+
+				if (lastStats.setBetAddress != null) {
+				updateText('setBetAddress', lastStats.setBetAddress.toString());
+				} else { updateText('setBetAddress', "N/A"); }
+			}, 7500);
+        }
+	};
+
+	/* Stats Functions */
+	function getStatsCells(stats){
+        return '<td>' + stats.id + '</td>' +
+                '<td>' + stats.won + '</td>' +
+                '<td>' + stats.multiplier + '</td>' +
+                '<td>' + numberWithCommas(stats.topoheight) + '</td>' +
+				'<td>' + formatTXLink(stats.txid) + '</td>';
+	}
+	
+	function numberWithCommas(x) {
+			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+
+	function formatTXLink(hash){
+			return '<a target="explorer" href="' + getTransactionUrl(hash) + '">' + hash + '</a>';
+		}
+
+	function getStatsRowElement(stats, jsonString){
+		var row = document.createElement('tr');
+		row.setAttribute('data-json', jsonString);
+		row.setAttribute('data-time', stats.topoheight);
+		row.setAttribute('id', 'statRow' + stats.id);
+
+		row.innerHTML = getStatsCells(stats);
+
+		return row;
+	}
+
+
+	function parseStats(serializedStat){
+		return {
+			id: serializedStat.UserKey,
+			won: serializedStat.Won,
+			multiplier: serializedStat.Multiplier,
+			topoheight: serializedStat.TopoHeight,
+			txid: serializedStat.TxID
+		};
+	}
+
+	function renderStats(statsResults){
+		var $statsRows = $('#dice_multiplier_stats');
+
+		for (var i = 0; i < statsResults.length; i++){
+			var stats = parseStats(statsResults[i]);
+			var statsJson = JSON.stringify(stats);
+			var existingRow = document.getElementById('statRow' + stats.id);
+
+			if (existingRow && existingRow.getAttribute('data-json') !== statsJson){
+				$(existingRow).replaceWith(getStatsRowElement(stats, statsJson));
+			}
+			else if (!existingRow){
+
+				var statElement = getStatsRowElement(stats, statsJson);
+
+				var inserted = false;
+				var rows = $statsRows.children().get();
+				
+				for (var f = 0; f < rows.length; f++) {
+					var pTime = parseInt(rows[f].getAttribute('data-time'));
+					if (pTime < stats.topoheight){
+						inserted = true;
+						$(rows[f]).before(statElement);
+						break;
+					}
+				}
+				
+				if (!inserted)
+					$statsRows.append(statElement);
+			}
+		}
+	}
+
+	/* Odds Functions */
+
+	function getOddsCells(odds){
+        return '<td>' + odds.multiplier + '</td>' +
+                '<td>' + odds.baseratio + '</td>' +
+                '<td>' + odds.historicalratio + '</td>';
+	}
+
+	function getOddsRowElement(odds, jsonString){
+		var row = document.createElement('tr');
+		row.setAttribute('data-json', jsonString);
+		row.setAttribute('data-time', odds.multiplier);
+		row.setAttribute('id', 'oddsRow' + odds.multiplier);
+
+		row.innerHTML = getOddsCells(odds);
+
+		return row;
+	}
+
+
+	function parseOdds(serializedOdd){
+		return {
+			multiplier: serializedOdd.Multiplier,
+			baseratio: serializedOdd.BaseRatio,
+			historicalratio: serializedOdd.HistoricalRatio,
+		};
+	}
+
+	function renderOdds(oddsData){
+		var $oddsRows = $('#dice_odds');
+
+		for (var i = 0; i < oddsData.length; i++){
+			var odds = parseOdds(oddsData[i]);
+			var oddsJson = JSON.stringify(odds);
+			var existingRow = document.getElementById('oddsRow' + odds.multiplier);
+
+			if (existingRow && existingRow.getAttribute('data-json') !== oddsJson){
+				$(existingRow).replaceWith(getOddsRowElement(odds, oddsJson));
+			}
+			else if (!existingRow){
+
+				var oddsElement = getOddsRowElement(odds, oddsJson);
+
+				var inserted = false;
+				var rows = $oddsRows.children().get();
+				
+				for (var f = 0; f < rows.length; f++) {
+					var pTime = parseInt(rows[f].getAttribute('datao-time'));
+					if (pTime < odds.topoheight){
+						inserted = true;
+						$(rows[f]).before(oddsElement);
+						break;
+					}
+				}
+				
+				if (!inserted)
+					$oddsRows.append(oddsElement);
+			}
+		}
+	}
+</script>
