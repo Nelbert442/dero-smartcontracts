@@ -351,7 +351,7 @@ func processing_thread() {
 				// If userKey exists, continue so that it'll get picked back up
 				allTxs := Graviton_backend.GetTXs()
 
-				// Loop through TXs to see if userKey exists
+				// Loop through TXs to see if user address exists also checks against e.Amount to be 1 (this is due to donations being larger and can ignore same addr calls)
 				var userKeyExists bool
 				for _, v := range allTxs {
 					if allTxs != nil {
@@ -363,9 +363,8 @@ func processing_thread() {
 					}
 				}
 				if userKeyExists {
-					//log.Printf("User (%v) already exists, continuing. Will be processed later.", e.Sender)
 					// Mainnet TODO: Can still send tx regarding no payout avail
-					//continue
+					continue
 				}
 
 				var txType string
@@ -660,9 +659,6 @@ func collectStats() {
 		}
 	}
 
-	// Define rollResults [*RollResults] alongside win and loss counts by multiplier
-	//stats["rollResults"] = rollResults
-	//stats["totalPlayed"] = totalPlayed
 	stats["faucetRuns"] = apiTxs
 	stats["coin"] = "DERO"
 	stats["transactionExplorer"] = "https://testnetexplorer.dero.io/tx/{id}"
