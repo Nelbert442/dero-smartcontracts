@@ -1,0 +1,160 @@
+<!-- Dice Stats -->
+<div style="height:10px"></div>
+<h3 class="push-up-20" data-tkey="faq1_title">How to use the faucet?</h3>
+<div class="card padding-15 push-down-10" data-tkey="faq1_text">
+	<p>Utilize option 5 within the cli-wallet (send a normal TX) to one of the addresses below in 'Connection Details'.</p>
+	<ul>
+		<li>"Faucet Address" - Utilizing this address pay out 10 DERO per address (1 time payment - future may be per 24h or so).</li>
+		<li>"Donation Address" - Utilizing this address allow for you to donate DERO to the cause! Provide more DERO for folks to receive from the faucet.</li>
+	</ul>
+
+	<p>See more details about the services here: <a href="https://github.com/Nelbert442/dero-smartcontracts">DERO Faucet</a></p>
+</div>
+<div style="height:10px"></div>
+<h3 class="push-up-15"><span data-tkey="connectionDetails">Connection Details<span></h3>
+	<div class="card padding-l-10 padding-r-10">
+		<div class="stats">
+			<div><i class="fa fa-money"></i> <span data-tkey="faucetRainAddress">Faucet Address: </span><span id="faucetRainAddress" style="word-wrap: break-word;"></span></div>
+			<div><i class="fa fa-money"></i> <span data-tkey="donationAddress">Donation Address: </span><span id="donationAddress" style="word-wrap: break-word;"></span></div>
+			<div><i class="fa fa-money"></i> <span data-tkey="faucetBalance">Faucet Balance: </span><span id="faucetBalance" style="word-wrap: break-word;"></span></div>
+		</div>
+	</div>
+<div style="height:10px"></div>
+</div>
+<div class="scrollWrapper2">
+<!--<h3 class="push-up-15"><span data-tkey="history">History<span></h3>-->
+	<div class="table-responsive"><h3><span data-tkey="history">History</span></h3>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th><i class="fa fa-group"></i> TimeStamp</th>
+				<th><i class="fa fa-money"></i> Address</th>
+				<th><i class="fa fa-money"></i> Type</th>
+				<th><i class="fa fa-clock-o"></i> Amount</th>
+				<th><i class="fa fa-paw"></i> TxID</th>
+			</tr>
+			</thead>
+			<tbody id="faucet_multiplier_stats">
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+    currentPage = {
+        destroy: function(){
+        },
+        update: function(){
+			if (lastStats.faucetRuns != null) {
+					renderStats(lastStats.faucetRuns);
+			}
+
+			if (lastStats.donationAddress != null) {
+			updateText('donationAddress', lastStats.donationAddress.toString());
+			} else { updateText('donationAddress', "N/A"); }
+
+			if (lastStats.faucetRainAddress != null) {
+			updateText('faucetRainAddress', lastStats.faucetRainAddress.toString());
+			} else { updateText('faucetRainAddress', "N/A"); }
+
+			if (lastStats.walletBalance != null) {
+			updateText('faucetBalance', lastStats.walletBalance.toString());
+			} else { updateText('faucetBalance', "N/A"); }
+
+			setInterval(function(){ 
+				if (lastStats.faucetRuns != null) {
+					renderStats(lastStats.faucetRuns);
+				}
+
+				if (lastStats.donationAddress != null) {
+				updateText('donationAddress', lastStats.donationAddress.toString());
+				} else { updateText('donationAddress', "N/A"); }
+
+				if (lastStats.faucetRainAddress != null) {
+				updateText('faucetRainAddress', lastStats.faucetRainAddress.toString());
+				} else { updateText('faucetRainAddress', "N/A"); }
+
+				if (lastStats.walletBalance != null) {
+				updateText('faucetBalance', lastStats.walletBalance.toString());
+				} else { updateText('faucetBalance', "N/A"); }
+			}, 7500);
+        }
+	};
+
+	/* Stats Functions */
+	function getStatsCells(stats){
+        return '<td>' + formatDate(stats.timestamp) + '</td>' +
+                '<td>' + stats.id + '</td>' +
+                '<td>' + stats.type + '</td>' +
+                '<td>' + stats.amount + '</td>' +
+				'<td>' + formatTXLink(stats.txid) + '</td>';
+	}
+
+	// Get readable time
+	function formatDate(time){
+			if (!time) return '';
+			return new Date(parseInt(time) * 1000).toLocaleString();
+		}
+
+	function numberWithCommas(x) {
+			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+
+	function formatTXLink(hash){
+			return '<a target="explorer" href="' + getTransactionUrl(hash) + '">' + hash + '</a>';
+		}	
+
+	function getStatsRowElement(stats, jsonString){
+		var row = document.createElement('tr');
+		row.setAttribute('data-json', jsonString);
+		row.setAttribute('data-time', stats.timestamp);
+		row.setAttribute('id', 'statRow' + stats.txid);
+
+		row.innerHTML = getStatsCells(stats);
+
+		return row;
+	}
+
+
+	function parseStats(serializedStat){
+		return {
+			id: serializedStat.DestinationAddress,
+			timestamp: serializedStat.TimeStamp,
+			type: serializedStat.Txrpc,
+			amount: serializedStat.Amount,
+			txid: serializedStat.Txid
+		};
+	}
+
+	function renderStats(statsResults){
+		var $statsRows = $('#faucet_multiplier_stats');
+
+		for (var i = 0; i < statsResults.length; i++){
+			var stats = parseStats(statsResults[i]);
+			var statsJson = JSON.stringify(stats);
+			var existingRow = document.getElementById('statRow' + stats.txid);
+
+			if (existingRow && existingRow.getAttribute('data-json') !== statsJson){
+				$(existingRow).replaceWith(getStatsRowElement(stats, statsJson));
+			}
+			else if (!existingRow){
+
+				var statElement = getStatsRowElement(stats, statsJson);
+
+				var inserted = false;
+				var rows = $statsRows.children().get();
+				
+				for (var f = 0; f < rows.length; f++) {
+					var pTime = parseInt(rows[f].getAttribute('data-time'));
+					if (pTime < stats.timestamp){
+						inserted = true;
+						$(rows[f]).before(statElement);
+						break;
+					}
+				}
+				
+				if (!inserted)
+					$statsRows.append(statElement);
+			}
+		}
+	}
+</script>

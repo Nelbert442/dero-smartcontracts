@@ -12,7 +12,8 @@ version="1.0.0"
 
 
 cd $CURDIR
-bash $ABSDIR/build_package.sh "github.com/Nelbert442/dero-smartcontracts/cmd/client-service"
+bash $ABSDIR/build_package.sh "github.com/Nelbert442/dero-smartcontracts/DERO-Dice/cmd/client-service"
+bash $ABSDIR/build_package.sh "github.com/Nelbert442/dero-smartcontracts/DERO-Faucet/cmd/server-service"
 #bash $ABSDIR/build_package.sh "github.com/Nelbert442/dero-smartcontracts/cmd/server-service"
 
 
