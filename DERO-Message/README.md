@@ -19,7 +19,9 @@ DeroMessage-Client.go contains the client service code. This can be ran locally.
 3) Client A sends COMMENT with variable and decrypt key (formatted: var1/mykey [hex encoded make([]byte, 32, 32)]) for specific message (random decrypt every time) to integrated addr of Client B (received from step 1)
 4) Client B received tx with var / decrypt key and gets message and decrypts to be viewed.
 
-Summary: Server service knows no difference other than integrated addr for deto addresses (to be replaced with engram), clients share keys directly. Messages are encrypted with unique keys for every message (persists keys via tx look back and SC variable lookup)
+V1 Summary: Clients share keys directly via rpc_COMMENT. Messages are encrypted with unique keys for every message (persists keys via tx look back and SC variable lookup).
+
+V2 Summary: Server service knows no difference other than integrated addr for deto addresses (to be replaced with username or other unique id services in future), clients share keys directly. Messages are encrypted with unique keys for every message (persists keys via tx look back and SC variable lookup)
 ```
 
 DeroEmail-Client usage and help output below (heavy development and will be modified in future iterations)
