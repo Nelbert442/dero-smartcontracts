@@ -4,6 +4,12 @@ For testnet purposes: I recommend generating a new client wallet to host the ser
 ### Disclaimer
 This implementation is under heavy development and this version is only for testing purposes at this time. The methods utilized through this service is subject to change with the release of the tx fee model ahead of mainnet release and can/will be re-evaluated ahead of that time.
 
+### Build
+You can download pre-compiled binaries and site content [here](https://github.com/Nelbert442/dero-smartcontracts/releases/tag/v1.0.0-dM) , or get source: 
+```
+go get github.com/Nelbert442/dero-smartcontracts/...
+```
+
 ### Client Service
 DeroMessage-Client.go contains the client service code. This can be ran locally.
 
