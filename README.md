@@ -2,3 +2,4 @@
 
 * [DERO Dice](/DERO-Dice/README.md)
 * [DERO Faucet](/DERO-Faucet/README.md)
+* [dM (DERO Message)](/DERO-Message/README.md)
