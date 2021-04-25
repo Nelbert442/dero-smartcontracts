@@ -217,7 +217,7 @@
         return '<td>' + formatDate(inbox.timestamp) + '</td>' +
 				'<td>' + inbox.sender + '</td>' +
                 '<td>' + inbox.rawmessage + '</td>' +
-				'<td>' + '<button class="btn btn-default" type="button" id="replyMessage" onclick="replyMessage(' + quote + inbox.scvalue + quote + ',' + quote + inbox.sender + quote + ');"><span><i class="fa fa-key"></i> <span data-tkey="replyMessage" style="word-wrap: break-word; white-space: normal;">Reply</span></span></button> <button class="btn btn-default" type="button" id="forwardMessage" onclick="forwardMessage(' + quote + inbox.scvalue + quote + ',' + quote + inbox.sender + quote + ');"><span><i class="fa fa-key"></i> <span data-tkey="forwardMessage" style="word-wrap: break-word; white-space: normal;">Forward</span></span></button>' + '</td>';
+				'<td>' + '<button class="btn btn-default" type="button" id="replyMessage" onclick="replyMessage(' + quote + inbox.scvalue + quote + ',' + quote + inbox.sender + quote + ');"><span><i class="fa fa-key"></i> <span data-tkey="replyMessage" style="word-wrap: break-word; white-space: normal;">Reply</span></span></button>'  + '</td>'; //<button class="btn btn-default" type="button" id="forwardMessage" onclick="forwardMessage(' + quote + inbox.scvalue + quote + ',' + quote + inbox.sender + quote + ');"><span><i class="fa fa-key"></i> <span data-tkey="forwardMessage" style="word-wrap: break-word; white-space: normal;">Forward</span></span></button>' + '</td>';
 	}
 
 	function getInboxRowElement(inbox, jsonString){
